@@ -33,43 +33,60 @@ module TEST_BRENCH_ALU(
     localparam SRA  =    6'b000011;
     localparam SRL  =    6'b000010;
     localparam NOR  =    6'b100111;
-    localparam MY_SIZE = 8;
-    reg [7:0] a1 ;
-    reg [7:0] b1 ;
+    localparam MY_SIZE_TB = 9;
+    localparam MY_SIZE_SW_TB = 16;
+    localparam MY_SIZE_OP_TB = 6;
+    reg [(MY_SIZE_SW_TB-1):0] sw;
     reg btnAA ;
     reg btnBB ;
     reg btnOP1 ;
     reg  [5:0] op;
     wire  signed [8:0]  res;
     wire  carry;
+    reg clock;
     
-    ALU #( .SIZE(MY_SIZE) ) myAlu
-   (a1,b1,op,btnAA,btnBB, btnOP1,res,carry);
+    EX #(MY_SIZE_TB, MY_SIZE_SW_TB,MY_SIZE_OP_TB)ex1 (clock,sw,btnAA, btnBB, btnOP1, res,carry);
      
     
     
     initial
     begin
-        
-        a1 = 8'b00000111;
-        b1 = 8'b00000010;
+       
+       sw = 16'b100;
+       btnBB = 1'b0;
+       btnOP1 = 1'b0;
+       btnAA = 1'b1;
+       clock = 1'b1;
+        #10
+        clock = ~clock; //flanco de bajada
+        //dump a
+        sw = 16'b110;
         btnAA = 1'b0;
         btnBB = 1'b1;
+        #100
+        clock = ~clock;//flanco de subida
+        #100
+        clock = ~clock;//flanco de bajada
+         //dump b
+        #100
+
+
+        btnBB = 1'b0;
+        sw = {10'b0,ADD};
         btnOP1 = 1'b1;
-        op = ADD;
-        #20;
-        btnAA = 1;
-        #20;
-        btnAA = 0;
-        a1 = 8'b0000010;
-        btnAA = 1;
-        #20
-        op = SUB;
-        b1=8'b00001000;
-        #20
-        b1=8'b10000000;
-        a1=8'b10000000;
-        op = ADD;
+        #100
+        clock = ~clock; //flanco de subida
+        #10
+        clock = ~clock; //flanco de bajada
+          //dump opcode
+
+        #10
+        clock = ~clock;
+        #10
+        clock = ~clock;
+
+
+      
 
         
     end
