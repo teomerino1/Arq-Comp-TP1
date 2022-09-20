@@ -23,7 +23,7 @@
 module EX
 #(
     parameter SIZE_OPERANDOS= 9,
-    parameter SIZE_SW = 16,
+    parameter SIZE_SW = 9,
     parameter SIZE_OPERACION = 6
 
 )
