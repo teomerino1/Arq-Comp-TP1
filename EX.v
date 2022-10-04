@@ -37,10 +37,11 @@ module EX
     output wire o_carry_ex
 );
 
-
+  // Cables que interconectan los modulos
     wire [(SIZE_OPERACION-1):0] opcode_ex;
     wire [(SIZE_OPERANDOS-1):0] a_ex;
     wire [(SIZE_OPERANDOS-1):0] b_ex;
+    //instancia de submodulos
     ALU  #(SIZE_OPERANDOS)alu1 (a_ex,b_ex,opcode_ex,o_res_ex, o_carry_ex);
     DEC #( SIZE_OPERANDOS,SIZE_SW,SIZE_OPERACION ) decode ( 
                                                                 i_clock,

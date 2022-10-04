@@ -22,7 +22,7 @@
 
 module ALU
 #(
-    parameter SIZE= 9
+    parameter SIZE= 9 //tamaño de los operandos, este es parametrizable
 
 )
 (
@@ -67,20 +67,16 @@ begin
                          
         ADD: begin
 
-             res <= i_a_alu + i_b_alu ; 
-             carry <= (  res[SIZE-1]  ^ i_a_alu[SIZE-1] ^ i_b_alu [SIZE-1] ) & res[SIZE-1]; // si el msb es 1 hay carry y prendemos el led carry
-           
-            if ((i_a_alu[SIZE-1] & i_b_alu [SIZE-1]) == 1 ) //Cuando los dos operandos son negativos; el bit de signo permanece negativo
-                 res[SIZE-1] <=1'b1;
-                 carry <=1'b0;
-             //si a y b son positivos y res me quedo negativo hubo carry
+             res <= i_a_alu + i_b_alu ;  
+            //carry con signo cuando los operandos tienen signo igual y el resultado tiene signo distinto
+            carry <= ((  res[SIZE-1]  ^ !(i_a_alu[SIZE-1] ^ i_b_alu [SIZE-1]) ) ) ; 
              end
         SUB: begin    
-            carry <=1'b0;
             res <= i_a_alu - i_b_alu ;
+            carry <= ((  res[SIZE-1]  ^ !(i_a_alu[SIZE-1] ^ !i_b_alu [SIZE-1]) ) ) ; 
             end
         AND: begin
-            carry <=1'b0;
+            carry <=1'b0; //reset carry
             res <= i_a_alu & i_b_alu ;
             end
         OR : begin
@@ -93,20 +89,50 @@ begin
             end
         SRA: begin
             carry <=1'b0;
-            res <= i_a_alu >>> 1 ;
+            res <= i_a_alu >>> 1'b1 ;
             end
         SRL: begin    
             carry <=1'b0;
-            res <= i_a_alu >>  1 ;
+            res <= i_a_alu >>  1'b1 ;
             end
         NOR: begin
             carry <=1'b0;   
             res <= ~(i_a_alu | i_b_alu );
             end 
-        //default: res <= {SIZE{0}};
+        default: begin
+            //reset
+            res <= {SIZE{0}};
+            carry <=1'b0;
+
+            end 
     endcase
 end
 
 
       
 endmodule
+
+
+//carry equivalente:
+            //  if(i_a_alu[SIZE-1] | i_b_alu [SIZE-1] == 1'b0) //operandos positivos
+            //     begin
+            //         if(res[SIZE-1] == 1'b1) //resultado positivo
+            //         begin
+            //             carry = 1'b0; //no hay carry
+            //         end
+            //         else //resultado negativo
+            //         begin
+            //             carry = 1'b1; //si hay carry
+            //         end
+            //     end
+            // else //operandos negativos
+            //     begin
+            //         if(res[SIZE-1] == 1'b1) //resultado positivo
+            //         begin
+            //             carry = 1'b1; //si hay carry
+            //         end
+            //         else //resultado negativo
+            //         begin
+            //             carry = 1'b0; //no hay carry
+            //         end
+            //     end
